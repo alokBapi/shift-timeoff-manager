@@ -33,4 +33,51 @@ private class TimeOffControllerTest {
             System.assert(e.getMessage().contains('End date'));
         }
     }
+        @isTest
+    static void getSubmittedRequests_returnsOnlySubmitted() {
+        Employee__c emp = [SELECT Id FROM Employee__c LIMIT 1];
+        TimeOffController.submitRequest(emp.Id, Date.today().addDays(5),
+            Date.today().addDays(6), 'Annual', null);
+        insert new Time_Off_Request__c(Employee__c = emp.Id,
+            Start_Date__c = Date.today().addDays(10), End_Date__c = Date.today().addDays(11),
+            Type__c = 'Sick', Status__c = 'Draft');
+        System.assertEquals(1, TimeOffController.getSubmittedRequests().size());
+    }
+
+    @isTest
+    static void updateStatus_approvesSubmittedRequest() {
+        Employee__c emp = [SELECT Id FROM Employee__c LIMIT 1];
+        Id reqId = TimeOffController.submitRequest(emp.Id, Date.today().addDays(5),
+            Date.today().addDays(6), 'Annual', null);
+        TimeOffController.updateStatus(reqId, 'Approved');
+        System.assertEquals('Approved',
+            [SELECT Status__c FROM Time_Off_Request__c WHERE Id = :reqId].Status__c);
+    }
+
+    @isTest
+    static void updateStatus_invalidStatus_throws() {
+        Employee__c emp = [SELECT Id FROM Employee__c LIMIT 1];
+        Id reqId = TimeOffController.submitRequest(emp.Id, Date.today().addDays(5),
+            Date.today().addDays(6), 'Annual', null);
+        try {
+            TimeOffController.updateStatus(reqId, 'Banana');
+            System.assert(false, 'Expected an exception');
+        } catch (AuraHandledException e) {
+            System.assert(e.getMessage().contains('Invalid'));
+        }
+    }
+
+    @isTest
+    static void updateStatus_alreadyDecided_throws() {
+        Employee__c emp = [SELECT Id FROM Employee__c LIMIT 1];
+        Id reqId = TimeOffController.submitRequest(emp.Id, Date.today().addDays(5),
+            Date.today().addDays(6), 'Annual', null);
+        TimeOffController.updateStatus(reqId, 'Rejected');
+        try {
+            TimeOffController.updateStatus(reqId, 'Approved');
+            System.assert(false, 'Expected an exception');
+        } catch (AuraHandledException e) {
+            System.assert(e.getMessage().contains('Only submitted'));
+        }
+    }
 }

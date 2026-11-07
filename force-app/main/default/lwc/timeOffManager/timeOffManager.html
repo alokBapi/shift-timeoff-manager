@@ -1,0 +1,12 @@
+<template>
+    <lightning-card title="Pending Time Off Requests" icon-name="standard:approval">
+        <template lwc:if={hasRows}>
+            <lightning-datatable key-field="id" data={rows} columns={columns}
+                hide-checkbox-column onrowaction={handleRowAction}>
+            </lightning-datatable>
+        </template>
+        <template lwc:else>
+            <p class="slds-var-p-around_medium">No pending requests.</p>
+        </template>
+    </lightning-card>
+</template>

@@ -1,0 +1,24 @@
+<template>
+    <lightning-card title="Request Time Off" icon-name="standard:event">
+        <div class="slds-var-p-around_medium">
+            <lightning-combobox label="Employee" data-field="employeeId" value={employeeId}
+                options={employeeOptions} onchange={handleChange} required>
+            </lightning-combobox>
+            <lightning-input type="date" label="Start date" data-field="startDate"
+                value={startDate} onchange={handleChange} required>
+            </lightning-input>
+            <lightning-input type="date" label="End date" data-field="endDate"
+                value={endDate} onchange={handleChange} required>
+            </lightning-input>
+            <lightning-combobox label="Type" data-field="leaveType" value={leaveType}
+                options={typeOptions} onchange={handleChange} required>
+            </lightning-combobox>
+            <lightning-textarea label="Reason" data-field="reason" value={reason}
+                onchange={handleChange}>
+            </lightning-textarea>
+            <lightning-button variant="brand" label="Submit request" onclick={handleSubmit}
+                disabled={isSaving} class="slds-var-m-top_small">
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>
